@@ -1,0 +1,4 @@
+prepare-commit-msg:
+  scripts:
+    abc.sh:
+      runner: bash
