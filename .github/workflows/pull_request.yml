@@ -3,6 +3,9 @@ name: Pull Request Template Chooser
 on:
   pull_request_target:
     types: [opened]
+    branches:
+      - main
+      - development
 
 jobs:
   choose-template:
