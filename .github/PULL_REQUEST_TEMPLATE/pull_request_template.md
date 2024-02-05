@@ -1,3 +1,8 @@
+Please go the the `Preview` tab and select the appropriate sub-template:
+
+* [Group A](?expand=1&template=tempalte1.md)
+* [Group B](?expand=1&template=tempalte2.md)
+
 # Title Default
 {Write a brief title of the commit}
 ## Description
