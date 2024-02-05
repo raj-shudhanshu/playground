@@ -19,6 +19,7 @@ jobs:
         run: |
           FEATURE_BRANCH_PATTERN="module-sdk"
           BUGFIX_BRANCH_PATTERN="development"
+          echo "${{ github.head_ref }}"
           if [[ "${{ github.head_ref }}" == $FEATURE_BRANCH_PATTERN* ]]; then
             echo "::set-output name=template_path::.github/PULL_REQUEST_TEMPLATE/template1.md"
           elif [[ "${{ github.head_ref }}" == $BUGFIX_BRANCH_PATTERN* ]]; then
