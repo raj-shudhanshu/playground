@@ -1,11 +1,11 @@
 name: Pull Request Template Chooser
 
 on:
-  pull_request_target:
-    types: [opened]
+  pull_request:
+    types: [opened, reopened]
     branches:
-      - main
       - development
+      - qa
 
 jobs:
   choose-template:
@@ -17,24 +17,24 @@ jobs:
       - name: Select Template
         id: template
         run: |
-          if [[ "${{ github.head_ref }}" == "module-*" ]]; then
-            echo "Using feature template"
-            echo "::set-output name=template::template1.md"
-          elif [[ "${{ github.head_ref }}" == "development" ]]; then
-            echo "Using bugfix template"
-            echo "::set-output name=template::template2.md"
+          FEATURE_BRANCH_PATTERN="module-sdk"
+          BUGFIX_BRANCH_PATTERN="development"
+          if [[ "${{ github.head_ref }}" == $FEATURE_BRANCH_PATTERN* ]]; then
+            echo "::set-output name=template_path::.github/PULL_REQUEST_TEMPLATE/template1.md"
+          elif [[ "${{ github.head_ref }}" == $BUGFIX_BRANCH_PATTERN* ]]; then
+            echo "::set-output name=template_path::.github/PULL_REQUEST_TEMPLATE/template2.md"
           else
-            echo "Using default template"
-            echo "::set-output name=template::pull_request_template.md"
+            echo "::set-output name=template_path::.github/PULL_REQUEST_TEMPLATE/pull_request_template.md"
           fi
 
-      - name: Apply Template to Pull Request
+      - name: Read Template Content
+        id: read-template
+        run: echo "::set-output name=template::$(cat ${{ steps.template.outputs.template_path }})"
+
+      - name: Update Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: Update pull request
-          title: Update pull request
+          pull-request-number: ${{ github.event.pull_request.number }}
           body: |
-            ${{ steps.template.outputs.template }}
-          base: ${{ github.base_ref }}
-          branch: ${{ github.head_ref }}
+            ${{ steps.read-template.outputs.template }}
