@@ -1,0 +1,37 @@
+name: Pull Request Template Chooser
+
+on:
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  choose-template:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Select Template
+        id: template
+        run: |
+          if [[ "${{ github.head_ref }}" == "module-*" ]]; then
+            echo "Using feature template"
+            echo "::set-output name=template::template1.md"
+          elif [[ "${{ github.head_ref }}" == "development" ]]; then
+            echo "Using bugfix template"
+            echo "::set-output name=template::template2.md"
+          else
+            echo "Using default template"
+            echo "::set-output name=template::pull_request_template.md"
+          fi
+
+      - name: Apply Template to Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Update pull request
+          title: Update pull request
+          body: |
+            ${{ steps.template.outputs.template }}
+          base: ${{ github.base_ref }}
+          branch: ${{ github.head_ref }}
